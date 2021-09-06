@@ -1,0 +1,40 @@
+{{define "layout"}}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" type="text/css">
+  <title>Time Tracking</title>
+
+</head>
+<body>
+	<div class="w3-auto">
+    	<div class="w3-container w3-card w3-blue">
+			<label>Project</label>
+			<label class="w3-black">{{.CurrentProject}}</label>
+			<label>Current</label>
+			<label class="w3-black">{{.CurrentTime}}</label>
+			<label>Today</label>
+			<label class="w3-black">{{.Today}}</label>
+			<label>Breaks</label>
+			<label class="w3-black">{{.Breaks}}</label>
+			{{ if .Tracking }}
+			<form action="/" method=Post>
+				<input type=hidden name=action value=stop>
+				<button class="w3-button" type=submit onclick="return confirm('stop tracking {{.CurrentProject}}')">Stop</button>
+			</form>
+			{{end}}
+	    </div>
+		<div class="w3-sidebar w3-bar-block" style="width:25%">
+			{{range .Projects }}
+			<form action="/" method=post>
+				<input type=hidden name=action value=start>
+				<input type=hidden name=project value={{.Key}}>
+				<button class="w3-button w3-block" type=submit>{{.Key}}</button>
+			</form>
+			{{end}}
+		</div>
+    </div>
+</body>
+</html>
+{{end}}
