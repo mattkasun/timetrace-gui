@@ -38,7 +38,7 @@ func main() {
 	file := fs.New(config)
 	timetrace = core.New(config, file)
 	router := SetupRouter()
-	router.Run("127.0.0.1:8080")
+	router.Run("127.0.0.1:8090")
 }
 
 func SetupRouter() *gin.Engine {
