@@ -7,6 +7,7 @@ import (
 )
 
 type PageData struct {
+	Page           string
 	Tracking       bool
 	CurrentProject string
 	CurrentTime    string
@@ -15,11 +16,12 @@ type PageData struct {
 	Projects       []*core.Project
 }
 
-func (data *PageData) Init() {
+func (data *PageData) Init(page string) {
 	//config := config.Get()
 	//file := fs.New(config)
 	//timetrace := core.New(config, file)
 	//current Project
+	data.Page = page
 	data.CurrentProject = "---"
 	data.CurrentTime = "---"
 	data.Tracking = false

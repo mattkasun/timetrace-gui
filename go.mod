@@ -1,6 +1,6 @@
-module tmp/time
+module github.com/mattkasun/timetrace-gui
 
-go 1.13
+go 1.16
 
 require (
 	github.com/dominikbraun/timetrace v0.13.0

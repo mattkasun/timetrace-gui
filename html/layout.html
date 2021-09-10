@@ -5,43 +5,33 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta http-equiv="refresh" content="60">
 	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" type="text/css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Two+Tone" type="text/css">
 	<title>Time Tracking</title>
 
     </head>
-    <body>
+    <body onLoad="setVisibility('{{.Page}}')">
 	<div class="w3-container w3-blue" style="text-align:center">
-	   <img src="images/timetrace.png" alt="Timetrace" > 
+	    <img src="images/timetrace.png" alt="Timetrace" > 
 	</div>
-	<div id="sidebar" class="w3-sidebar w3-bar-block w3-collapse w3-animate-left" style="width:200px">
-	    <button class="w3-bar-item w3-button w3-large w3-hide-large" onclick="document.getElementById('sidebar').style.display='none'">Close &times;</button>
-	    {{range .Projects }}
-	    <form action="/" method=post>
-		<input type=hidden name=action value=start>
-		<input type=hidden name=project value={{.Key}}>
-		<button class="w3-button w3-block w3-left-align" type=submit>{{.Key}}</button>
-	    </form>
-	    {{end}}
-	</div>
-	<div class="w3-main" style="margin-left:200px">
-	    <button class="w3-button w3-grey w3-small w3-hide-large" onclick="document.getElementById('sidebar').style.display='block'">&#9776; Projects</button><br>
-	    <label>Project</label>
-	    <label class="w3-sand">{{.CurrentProject}}</label><br>
-	    <label>Current</label>
-	    <label class="w3-sand">{{.CurrentTime}}</label><br>
-	    <label>Today</label>
-	    <label class="w3-sand">{{.Today}}</label><br>
-	    <label>Breaks</label>
-	    <label class="w3-sand">{{.Breaks}}</label><br>
-	    {{ if .Tracking }}
-	    <form action="/" method=Post>
-		<input type=hidden name=action value=stop>
-		<button class="w3-button" type=submit onclick="return confirm('stop tracking {{.CurrentProject}}')">Stop</button>
-	    </form>
-	    {{end}}
-	    <div class=w3-container>
-		<p> more stuff here </p>
+	    {{template "buttonbar"}}
+	    <div id="sidebar" class="w3-sidebar w3-bar-block w3-collapse w3-animate-left" style="width:200px">
+		<button class="w3-bar-item w3-button w3-large w3-hide-large" onclick="document.getElementById('sidebar').style.display='none'">Close &times;</button>
+		{{range .Projects }}
+		<form action="/" method=post>
+		    <input type=hidden name=action value=start>
+		    <input type=hidden name=project value={{.Key}}>
+		    <button class="w3-button w3-block w3-left-align" type=submit>{{.Key}}</button>
+		</form>
+		{{end}}
 	    </div>
-	</div>
+	    <div class="w3-main" style="margin-left:200px">
+		<button class="w3-button w3-grey w3-small w3-hide-large" onclick="document.getElementById('sidebar').style.display='block'">&#9776; Projects</button><br>
+		{{template "main" .}}
+		<div class=w3-container>
+		    <p> more stuff here </p>
+		</div>
+	    </div>
+	    {{template "script"}}
 
 
     </body>

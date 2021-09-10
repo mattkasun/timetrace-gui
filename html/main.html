@@ -1,0 +1,23 @@
+{{define "main"}}
+<div id="main" class="w3-white tab" {{/* style="display=none" */}}>
+		<label>Current Project</label>
+		<label class="w3-sand">{{.CurrentProject}}</label><br>
+		<form action="/" method=Post>
+		{{ if .Tracking }}
+		    <input type=hidden name=action value=stop>
+		    <button class="w3-button" type=submit><span class="material-icons-two-tone">timer_off</span> Stop</button>
+		</form>
+		{{end}}
+		<ul>
+		    <li><label>Time This Session </label>
+			<label class="w3-sand">{{.CurrentTime}}</label><br></li>
+		    <li><label>Time Today </label>
+			<label class="w3-sand">{{.CurrentTime}}</label><br></li>
+		</ul>
+		<label>Total Time Today</label>
+		<label class="w3-sand">{{.Today}}</label><br>
+		<label>Total Breaks</label>
+		<label class="w3-sand">{{.Breaks}}</label><br>
+</div>
+{{end}}
+

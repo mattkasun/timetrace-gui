@@ -14,13 +14,13 @@ import (
 func DisplayLanding(c *gin.Context) {
 	var page PageData
 
-	page.Init()
+	page.Init("main")
 	c.HTML(http.StatusOK, "layout", page)
 }
 
 func StartStop(c *gin.Context) {
 	var page PageData
-	page.Init()
+	page.Init("main")
 	action := c.PostForm("action")
 	project := c.PostForm("project")
 	var err error
