@@ -6,6 +6,12 @@ import (
 	"github.com/dominikbraun/timetrace/core"
 )
 
+type Users struct {
+	Username string
+	Password string
+	IsAdmin  bool
+}
+
 type PageData struct {
 	Page           string
 	Tracking       bool
