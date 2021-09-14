@@ -40,7 +40,7 @@ func (data *PageData) Init(page string) {
 			data.Tracking = true
 		}
 		if report.TrackedTimeCurrent != nil {
-			data.CurrentTime = timetrace.Formatter().FormatCurrentTime(report)
+			data.CurrentTime = timetrace.Formatter().FormatDuration(report.TrackedTimeToday)
 		}
 		data.Today = timetrace.Formatter().FormatDuration(report.TrackedTimeToday)
 		data.Breaks = timetrace.Formatter().FormatDuration(report.BreakTimeToday)
