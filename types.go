@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/dominikbraun/timetrace/core"
 )
@@ -13,13 +14,14 @@ type Users struct {
 }
 
 type PageData struct {
-	Page           string
-	Tracking       bool
-	CurrentProject string
-	CurrentTime    string
-	Today          string
-	Breaks         string
-	Projects       []*core.Project
+	Page               string
+	Tracking           bool
+	CurrentProject     string
+	CurrentSession     string
+	CurrentProjectTime string
+	Today              string
+	Breaks             string
+	Projects           []*core.Project
 }
 
 func (data *PageData) Init(page string) {
@@ -29,22 +31,37 @@ func (data *PageData) Init(page string) {
 	//current Project
 	data.Page = page
 	data.CurrentProject = "---"
-	data.CurrentTime = "---"
+	data.CurrentSession = "---"
+	data.CurrentProjectTime = "---"
 	data.Tracking = false
-	report, err := timetrace.Status()
-	fmt.Println(report)
+	status, err := timetrace.Status()
 	fmt.Println("error: ", err)
 	if err == nil {
-		if report.Current != nil {
-			data.CurrentProject = report.Current.Project.Key
+		fmt.Println("populating data", status.Current, status.TrackedTimeCurrent)
+		if status.Current != nil {
+			data.CurrentProject = status.Current.Project.Key
 			data.Tracking = true
 		}
-		if report.TrackedTimeCurrent != nil {
-			data.CurrentTime = timetrace.Formatter().FormatDuration(report.TrackedTimeToday)
+		if status.TrackedTimeCurrent != nil {
+			data.CurrentSession = timetrace.Formatter().FormatDuration(*status.TrackedTimeCurrent)
 		}
-		data.Today = timetrace.Formatter().FormatDuration(report.TrackedTimeToday)
-		data.Breaks = timetrace.Formatter().FormatDuration(report.BreakTimeToday)
+		//Get Time worked today on Current Project
+		records, err := timetrace.ListRecords(time.Now())
+		var elapsed time.Duration
+		if err == nil {
+			for _, record := range records {
+				if record.Project.Key == data.CurrentProject {
+					elapsed = elapsed + record.Duration()
+					fmt.Println(elapsed, record.Duration())
+				}
+			}
+			data.CurrentProjectTime = timetrace.Formatter().FormatDuration(elapsed)
+		}
+		data.Today = timetrace.Formatter().FormatDuration(status.TrackedTimeToday)
+		data.Breaks = timetrace.Formatter().FormatDuration(status.BreakTimeToday)
+
 	}
+
 	//get all projects
 	data.Projects, err = timetrace.ListProjects()
 	if err != nil {

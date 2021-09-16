@@ -35,10 +35,10 @@ func StartStop(c *gin.Context) {
 	if action == "start" {
 		fmt.Println("Staring Project ", project, "tracking status is ", page.Tracking)
 		if page.Tracking {
-			fmt.Println("Currently Tracking ", page.CurrentProject, " need to stop first ", page.CurrentTime)
+			fmt.Println("Currently Tracking ", page.CurrentProject, " need to stop first ", page.CurrentSession)
 			//need to check that current project has been tracked for at least one minute
 			//no need to track time of less than minute and allow creation of new record
-			if page.CurrentTime == "0h 0min" {
+			if page.CurrentSession == "0h 0min" {
 				fmt.Println("need to delete current record")
 				record, err = timetrace.LoadRecord(time.Now())
 				err = timetrace.DeleteRecord(*record)
@@ -100,7 +100,7 @@ func ProcessLogin(c *gin.Context) {
 		if isadmim {
 			session.Set("admin", true)
 		}
-		sessions.Default(c).Options(sessions.Options{MaxAge: 70})
+		sessions.Default(c).Options(sessions.Options{MaxAge: 1800})
 		session.Save()
 		location := url.URL{Path: "/"}
 		c.Redirect(http.StatusFound, location.RequestURI())

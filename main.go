@@ -26,7 +26,7 @@ func main() {
 func SetupRouter() *gin.Engine {
 	store := memstore.NewStore([]byte("secret"))
 	session := sessions.Sessions("netmaker", store)
-	options := sessions.Options{MaxAge: 30}
+	options := sessions.Options{MaxAge: 7200}
 	fmt.Println("options\n", options)
 	router := gin.Default()
 	router.Use(session)
