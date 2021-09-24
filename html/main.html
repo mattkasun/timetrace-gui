@@ -1,24 +1,24 @@
 {{define "main"}}
 <div id="main" class="w3-white tab" {{/* style="display=none" */}}>
-		<label>Current Project</label>
-		<label class="w3-sand">{{.CurrentProject}}</label><br>
-		<ul>
-		    <li><label>Time This Session </label>
+	<label>Current Project</label>
+	<label class="w3-sand">{{.CurrentProject}}</label><br>
+	<ul>
+		<li><label>Time This Session </label>
 			<label class="w3-sand">{{.CurrentSession}}</label><br></li>
-		    <li><label>Time Today </label>
-			<label class="w3-sand">{{.CurrentProjectTime}}</label><br></li>
-		</ul>
-		<form action="/" method=Post>
-		{{ if .Tracking }}
-		    <input type=hidden name=action value=stop>
-		    <button class="w3-button" type=submit><span class="material-icons-two-tone">timer_off</span> Stop</button>
-		</form>
-		{{end}}
+			<li><label>Time Today </label>
+				<label class="w3-sand">{{.CurrentProjectTime}}</label><br></li>
+	</ul>
+	<form action="/" method=Post>
+{{ if .Tracking }}
+		<input type=hidden name=action value=stop>
+		<button class="w3-button" type=submit><span class="material-icons-two-tone">timer_off</span> Stop</button>
+	</form>
+{{end}}
 
-		<label>Total Time Today</label>
-		<label class="w3-sand">{{.Today}}</label><br>
-		<label>Total Breaks</label>
-		<label class="w3-sand">{{.Breaks}}</label><br>
+	<label>Total Time Today</label>
+	<label class="w3-sand">{{.Today}}</label><br>
+	<label>Total Breaks</label>
+	<label class="w3-sand">{{.Breaks}}</label><br>
 </div>
 {{end}}
 
