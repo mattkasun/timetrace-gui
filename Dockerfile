@@ -10,7 +10,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix temp -ldflags '-extldfla
 FROM busybox
 WORKDIR /root/
 COPY --from=builder /go/src/github.com/mattkasun/timetrace-gui/timetrace-gui .
-ADD /images/* resources/
+ADD /images/* images/
 ADD /html/* html/
 CMD ["./timetrace-gui"]
 
