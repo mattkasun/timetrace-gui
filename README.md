@@ -20,17 +20,17 @@ You can use timetrace-gui and timetrace at the same time. Updates entered in one
 
 On first run a user creation dialog will be presented.  Use the user/password you entered for future logins.
 
-##Screenshots
+## Screenshots
 ### Web
 ![browser](https://github.com/mattkasun/timetrace-gui/raw/master/screenshots/web.png "TimeTrace-GUI with Browser")
 
 ### Mobile
 ![phone](https://github.com/mattkasun/timetrace-gui/raw/master/screenshots/mobile.png "TimeTrace-GUI with Phone")
 
-##RoadMap
--[] Restore deleted projects
--[] Edit project
--[] Edit record
--[] Reports
--[] Edit Configuration
--[] Users
+## RoadMap
+- [ ] Restore deleted projects
+- [ ] Edit project
+- [ ] Edit record
+- [ ] Reports
+- [ ] Edit Configuration
+- [ ] Users
