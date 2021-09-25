@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/dominikbraun/timetrace/core"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-gonic/gin"
 )
 
 type Users struct {
@@ -13,8 +15,14 @@ type Users struct {
 	IsAdmin  bool
 }
 
+type ProjectTime struct {
+	Project string
+	Time    string
+}
+
 type PageData struct {
 	Page               string
+	Message            string
 	Tracking           bool
 	CurrentProject     string
 	CurrentSession     string
@@ -22,13 +30,12 @@ type PageData struct {
 	Today              string
 	Breaks             string
 	Projects           []*core.Project
+	Summary            map[string]string
 }
 
-func (data *PageData) Init(page string) {
-	//config := config.Get()
-	//file := fs.New(config)
-	//timetrace := core.New(config, file)
-	//current Project
+func (data *PageData) Init(page string, c *gin.Context) {
+	session := sessions.Default(c)
+	data.Message = session.Get("message").(string)
 	data.Page = page
 	data.CurrentProject = "---"
 	data.CurrentSession = "---"
@@ -48,12 +55,22 @@ func (data *PageData) Init(page string) {
 		//Get Time worked today on Current Project
 		records, err := timetrace.ListRecords(time.Now())
 		var elapsed time.Duration
+		m := make(map[string]time.Duration)
+		s := make(map[string]string)
+		data.Summary = s
 		if err == nil {
 			for _, record := range records {
+				//Get Time worked today on Current Project
 				if record.Project.Key == data.CurrentProject {
 					elapsed = elapsed + record.Duration()
 					fmt.Println(elapsed, record.Duration())
 				}
+				m[record.Project.Key] = m[record.Project.Key] + record.Duration()
+			}
+			fmt.Println(m)
+			for key, value := range m {
+				fmt.Println("key:value ", key, value)
+				data.Summary[key] = timetrace.Formatter().FormatDuration(value)
 			}
 			data.CurrentProjectTime = timetrace.Formatter().FormatDuration(elapsed)
 		}
@@ -67,6 +84,7 @@ func (data *PageData) Init(page string) {
 	if err != nil {
 		data.Projects = []*core.Project{}
 	}
+
 	fmt.Println(data.Projects)
 
 }

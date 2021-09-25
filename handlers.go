@@ -18,16 +18,18 @@ import (
 
 func DisplayLanding(c *gin.Context) {
 	var page PageData
-	//session := sessions.Default(c)
+	session := sessions.Default(c)
 	//options := session.Options
 	//fmt.Println("---------options", &options.MaxAge)
-	page.Init("main")
+	page.Init("main", c)
+	session.Set("message", "")
+	session.Save()
 	c.HTML(http.StatusOK, "layout", page)
 }
 
 func StartStop(c *gin.Context) {
 	var page PageData
-	page.Init("main")
+	page.Init("main", c)
 	action := c.PostForm("action")
 	project := c.PostForm("project")
 	var err error
@@ -74,6 +76,48 @@ func StartStop(c *gin.Context) {
 	//c.HTML(http.StatusOK, "layout", page)
 }
 
+func CreateProject(c *gin.Context) {
+	var project core.Project
+	project.Key = c.PostForm("name")
+	session := sessions.Default(c)
+	if err := timetrace.SaveProject(project, false); err != nil {
+		session.Set("message", err.Error())
+	} else {
+		session.Set("message", "New Project "+project.Key+" Created")
+	}
+	session.Save()
+	location := url.URL{Path: "/"}
+	c.Redirect(http.StatusFound, location.RequestURI())
+}
+
+func DeleteProject(c *gin.Context) {
+	var project core.Project
+	success := true
+	project.Key = c.PostForm("project")
+	deleteRecords := c.PostForm("records")
+	session := sessions.Default(c)
+	if err := timetrace.BackupProject(project.Key); err != nil {
+		session.Set("message", err.Error())
+		success = false
+	}
+	if deleteRecords == "on" && success {
+		if err := timetrace.DeleteRecordsByProject(project.Key); err != nil {
+			session.Set("message", err.Error())
+			success = false
+		}
+	}
+	if success {
+		if err := timetrace.DeleteProject(project); err != nil {
+			session.Set("message", err.Error())
+		} else {
+			session.Set("message", "Project "+project.Key+" has been Deleted")
+		}
+	}
+	session.Save()
+	location := url.URL{Path: "/"}
+	c.Redirect(http.StatusFound, location.RequestURI())
+}
+
 func NewUser(c *gin.Context) {
 	var user Users
 	user.Username = c.PostForm("user")
@@ -97,6 +141,7 @@ func ProcessLogin(c *gin.Context) {
 	if valid {
 		session := sessions.Default(c)
 		session.Set("loggedIn", true)
+		session.Set("message", "")
 		if isadmim {
 			session.Set("admin", true)
 		}

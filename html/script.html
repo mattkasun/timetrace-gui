@@ -3,6 +3,14 @@
 
 	var network = "All"
 
+function setUp(tabName, message) {
+  setVisibility(tabName);
+		{{/*nodeStatus = window.setInterval(getNodeStatus, 30000);*/}}
+  if (message != "") {
+		alert(message)
+  }
+    {{/* window.setInterval(refresh, 120000); */}}
+}
 function setVisibility(tabName) {
 	var i;
 	var x = document.getElementsByClassName ("tab");

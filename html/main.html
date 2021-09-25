@@ -1,12 +1,12 @@
 {{define "main"}}
-<div id="main" class="w3-white tab" {{/* style="display=none" */}}>
+<div id="main" class="w3-white tab w3-padding"> {{/*style="margin-right:200px"> */}}
 	<label>Current Project</label>
-	<label class="w3-sand">{{.CurrentProject}}</label><br>
+	<label >{{.CurrentProject}}</label><br>
 	<ul>
 		<li><label>Time This Session </label>
-			<label class="w3-sand">{{.CurrentSession}}</label><br></li>
+			<label >{{.CurrentSession}}</label><br></li>
 			<li><label>Time Today </label>
-				<label class="w3-sand">{{.CurrentProjectTime}}</label><br></li>
+				<label >{{.CurrentProjectTime}}</label><br></li>
 	</ul>
 	<form action="/" method=Post>
 {{ if .Tracking }}
@@ -15,10 +15,15 @@
 	</form>
 {{end}}
 
-	<label>Total Time Today</label>
-	<label class="w3-sand">{{.Today}}</label><br>
-	<label>Total Breaks</label>
-	<label class="w3-sand">{{.Breaks}}</label><br>
+<h2> Time worked today </h2>
+{{range $key, $value := .Summary}}
+<strong><label>{{ $key }}</label></strong> {{ $value }}<br>
+{{end}}
+<br>
+<strong><label>Total Time Today</label></strong>
+	<label >{{.Today}}</label><br>
+	<strong>	<label>Total Breaks</label></strong>
+	<label >{{.Breaks}}</label><br>
 </div>
 {{end}}
 

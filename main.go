@@ -40,6 +40,8 @@ func SetupRouter() *gin.Engine {
 	{
 		restricted.GET("/", DisplayLanding)
 		restricted.POST("/", StartStop)
+		restricted.POST("/create_project", CreateProject)
+		restricted.POST("/delete_project", DeleteProject)
 	}
 
 	return router
