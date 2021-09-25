@@ -1,7 +1,9 @@
 package main
 
 import (
+	"embed"
 	"fmt"
+	"html/template"
 	"net/http"
 	"os"
 
@@ -15,6 +17,9 @@ import (
 
 var timetrace *core.Timetrace
 
+//go:embed html/* images/*
+var f embed.FS
+
 func main() {
 	config := config.Get()
 	file := fs.New(config)
@@ -25,14 +30,17 @@ func main() {
 
 func SetupRouter() *gin.Engine {
 	store := memstore.NewStore([]byte("secret"))
-	session := sessions.Sessions("netmaker", store)
+	session := sessions.Sessions("timetrace", store)
 	options := sessions.Options{MaxAge: 7200}
 	fmt.Println("options\n", options)
 	router := gin.Default()
 	router.Use(session)
-	router.LoadHTMLGlob("html/*")
-	router.StaticFile("favicon.ico", "./images/favicon.ico")
-	router.Static("images", "./images")
+	//router.LoadHTMLGlob("html/*")
+	templates := template.Must(template.New("").ParseFS(f, "html/*"))
+	router.SetHTMLTemplate(templates)
+	//router.StaticFile("favicon.ico", "./images/favicon.ico")
+	//router.Static("images", "./images")
+	router.StaticFS("/images", http.FS(f))
 	router.POST("/newuser", NewUser)
 	router.POST("/login", ProcessLogin)
 	router.GET("/logout", Logout)
