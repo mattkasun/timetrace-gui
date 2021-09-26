@@ -143,10 +143,10 @@ func ProcessLogin(c *gin.Context) {
 
 func Logout(c *gin.Context) {
 	session := sessions.Default(c)
-	//sessions.Default(c).Options(sessions.Options{MaxAge: -1})
-	session.Options(sessions.Options{MaxAge: -1})
+	session.Set("loggedIn", false)
 	session.Save()
-	c.JSON(http.StatusOK, gin.H{"message": "Successful logout"})
+	location := url.URL{Path: "/"}
+	c.Redirect(http.StatusFound, location.RequestURI())
 }
 
 func hashPassword(password string) (string, error) {
