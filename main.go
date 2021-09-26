@@ -17,6 +17,9 @@ import (
 
 var timetrace *core.Timetrace
 
+//go:embed: images/favicon.ico
+var icon embed.FS
+
 //go:embed html/* images/*
 var f embed.FS
 
@@ -39,8 +42,12 @@ func SetupRouter() *gin.Engine {
 	templates := template.Must(template.New("").ParseFS(f, "html/*"))
 	router.SetHTMLTemplate(templates)
 	//router.StaticFile("favicon.ico", "./images/favicon.ico")
+	router.StaticFS("/favicon.ico", http.FS(icon))
 	//router.Static("images", "./images")
-	router.StaticFS("/images", http.FS(f))
+	router.GET("/images/*filepath", func(c *gin.Context) {
+		c.FileFromFS(c.Request.URL.Path, http.FS(f))
+	})
+	//router.StaticFS("/images", http.FS(f))
 	router.POST("/newuser", NewUser)
 	router.POST("/login", ProcessLogin)
 	router.GET("/logout", Logout)
