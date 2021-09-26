@@ -13,10 +13,14 @@
 						</div>
 				</div>
 				<button class="w3-bar-item w3-button tablink w3-teal" onclick="openTab(event, 'main')">Tracking</button>
-				<button class="w3-bar-item w3-button tablink" onclick="openTab(event, 'reports')">Reports</button>
-				<button class="w3-bar-item w3-button tablink" onclick="openTab(event, 'config')">Edit Configuration</button>
-				<button class="w3-bar-item w3-button tablink" onclick="alert('Not Implemented Yet')">Users</button>
-				<button class="w3-bar-item w3-button tablink" onclick="alert('Not Implemented Yet')">Stop Tracking</button>
+				<button class="w3-bar-item w3-button tablink" onclick="alert('Not Implemented Yet');">Reports</button>
+				<button class="w3-bar-item w3-button tablink" onclick="alert('Not Implemented Yet');">Edit Configuration</button>
+				<button class="w3-bar-item w3-button tablink" onclick="alert('Not Implemented Yet');">Users</button>
+				<form action="/" method=Post>
+					<button class="w3-bar-item w3-button tablink">Stop Tracking</button>
+					<input type=hidden name=action value=stop>
+				</form>
+
 		</div>
 </div>
 

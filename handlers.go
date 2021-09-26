@@ -29,51 +29,40 @@ func DisplayLanding(c *gin.Context) {
 
 func StartStop(c *gin.Context) {
 	var page PageData
+	session := sessions.Default(c)
 	page.Init("main", c)
 	action := c.PostForm("action")
 	project := c.PostForm("project")
 	var err error
 	var record *core.Record
 	if action == "start" {
-		fmt.Println("Staring Project ", project, "tracking status is ", page.Tracking)
 		if page.Tracking {
 			fmt.Println("Currently Tracking ", page.CurrentProject, " need to stop first ", page.CurrentSession)
 			//need to check that current project has been tracked for at least one minute
 			//no need to track time of less than minute and allow creation of new record
 			if page.CurrentSession == "0h 0min" {
-				fmt.Println("need to delete current record")
 				record, err = timetrace.LoadRecord(time.Now())
 				err = timetrace.DeleteRecord(*record)
 			} else {
 				err = timetrace.Stop()
 			}
-			if err != nil {
-				fmt.Println("error stopping project ", page.CurrentProject, err)
-				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-				c.Abort()
-				return
-			}
-			fmt.Println(page.CurrentProject, " stop successfully")
 		}
 		err = timetrace.Start(project, true)
-		fmt.Println("Started project ", project, err)
+
 	} else if action == "stop" {
-		fmt.Println("stop time tracking")
 		err = timetrace.Stop()
-		fmt.Println("time tracking stopped", err)
 	} else {
 		err = errors.New("invalid request")
 	}
-	fmt.Println("error", err)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		c.Abort()
-		return
+		fmt.Println("------errors ", err)
+		session.Set("message", err.Error())
+	} else {
+		session.Set("message", "")
 	}
+	session.Save()
 	location := url.URL{Path: "/"}
 	c.Redirect(http.StatusFound, location.RequestURI())
-	//page.Init()
-	//c.HTML(http.StatusOK, "layout", page)
 }
 
 func CreateProject(c *gin.Context) {
