@@ -11,8 +11,7 @@ spec:
       - path: "/"
   workers:
   - dockerfile_path: Dockerfile
-    name: cli
-    git:
+     git:
      branch: master
      repo_clone_url: https://github.com/dominikbraun/timetrace.git
      name: timetrace
