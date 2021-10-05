@@ -9,12 +9,5 @@ spec:
     http_port: 8090
     routes:
       - path: "/"
-  workers:
-  - dockerfile_path: Dockerfile
-     git:
-     branch: master
-     repo_clone_url: https://github.com/dominikbraun/timetrace.git
-     name: timetrace
 
-       
        
