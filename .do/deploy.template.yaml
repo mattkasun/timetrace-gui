@@ -1,13 +1,14 @@
 spec:
   name: timetrace
   services:
-  - dockerfile_path: Dockerfile
-    git:
-      branch: master
-      repo_clone_url: https://github.com/mattkasun/timetrace-gui.git
-    name: timetrace  
+  - name: gui
+    image:
+      registry_type: DOCKER_HUB
+      registry: DOCKER_HUB
+      repository: nusak/timetrace-gui
+      tag: v0.0.1
     http_port: 8090
     routes:
-      - path: "/"
+     - path: "/"
 
        
