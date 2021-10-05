@@ -27,7 +27,7 @@ Any new timetrace projects or records created in $HOME/.timetrace will be owned 
 
 A docker container without permission issues is on the roadmap
 
-[![Deploy to DO](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/{mattkasun}/{timetrace-gui}/tree/{master})
+[![Deploy to DO](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/mattkasun/timetrace-gui/tree/master)
 
 ### Native binary
 Download the appropriate binary 
