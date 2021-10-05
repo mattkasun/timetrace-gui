@@ -1,14 +1,19 @@
-spec:
-  name: timetrace
-  services:
-  - name: gui
-    image:
-      registry_type: DOCKER_HUB
-      registry: DOCKER_HUB
-      repository: nusak/timetrace-gui
-      tag: v0.0.1
-    http_port: 8090
-    routes:
-     - path: "/"
+alerts:
+- rule: DEPLOYMENT_FAILED
+name: timetrace
+region: tor
+services:
+- name: timetrace
+  image:
+    registry_type: DOCKER_HUB
+    registry: nusak
+    repository: timetrace-gui
+    tag: v0.0.1
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  http_port: 8090
+  routes:
+   - path: /
+  source_dir: /
 
        
