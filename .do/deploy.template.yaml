@@ -1,5 +1,3 @@
-alerts:
-- rule: DEPLOYMENT_FAILED
 name: timetrace
 region: tor
 services:
