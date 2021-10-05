@@ -1,0 +1,21 @@
+spec:
+  name: timetrace
+  services:
+    - name: gui
+      image:
+       registry_type: "DOCKER_HUB"
+       registry: "mattkasun"
+       repository: "timetrace-gui"
+       tag: "v0.0.1"
+      http_port: 8090
+      routes:
+        -path: "/"
+  workers:
+    - name: cli
+      image:
+       registry_type: "DOCKER_HUB"
+       registry: "dominikbraun"
+       repository: "timetrace"
+       tag: "latest"
+       
+       
