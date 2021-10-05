@@ -4,8 +4,8 @@ spec:
     - name: gui
       image:
        registry_type: "DOCKER_HUB"
-       registry: "mattkasun"
-       repository: "timetrace-gui"
+       registry: "DOCKER_HUB"
+       repository: "mattkasun/timetrace-gui"
        tag: "v0.0.1"
       http_port: 8090
       routes:
@@ -14,8 +14,8 @@ spec:
     - name: cli
       image:
        registry_type: "DOCKER_HUB"
-       registry: "dominikbraun"
-       repository: "timetrace"
+       registry: "DOCKER_HUB"
+       repository: "dominikbraun/timetrace"
        tag: "latest"
        
        
