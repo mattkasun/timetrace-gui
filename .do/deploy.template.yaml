@@ -1,7 +1,7 @@
 name: timetrace
 region: tor
 services:
-  - http_port: 8090
+- http_port: 8090
   image:
     registry_type: DOCKER_HUB
     registry: nusak
