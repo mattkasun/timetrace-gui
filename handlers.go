@@ -134,7 +134,7 @@ func ProcessLogin(c *gin.Context) {
 		if isadmim {
 			session.Set("admin", true)
 		}
-		sessions.Default(c).Options(sessions.Options{MaxAge: 28800})
+		sessions.Default(c).Options(sessions.Options{MaxAge: 28800, Secure: true, SameSite: http.SameSiteLaxMode})
 		session.Save()
 		location := url.URL{Path: "/"}
 		c.Redirect(http.StatusFound, location.RequestURI())
