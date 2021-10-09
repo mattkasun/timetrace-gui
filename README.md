@@ -16,29 +16,19 @@ You can use timetrace-gui and timetrace at the same time if you use the native b
   - freepngimg.com/
 
 ## Installation
-### Docker
-**:warning: warning**
-
-Any new timetrace projects or records created in $HOME/.timetrace will be owned by root.  Not an issue if you only use timetrace-gui but it will cause problems with timetrace itself.
-
-**:warning: warning**
-
-`docker run --name timetrace-gui -p 8090:8090 -v $HOME/.timetrace:/root/.timetrace nusak/timetrace-gui:v0.0.1`
-
-A docker container without permission issues is on the roadmap
-
-[![Deploy to DO](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/mattkasun/timetrace-gui/tree/master)
-
 ### Native binary
-Download the appropriate binary 
-- x86 (https://github.com/mattkasun/timetrace-gui/blob/master/timetrace-gui) 
-- i386 - coming soon
-- windows - comming soon
-- mac - coming soon
-- arm64 (pi4) - coming soon
-- arm7 (pi3) - coming soon
+Download the appropriate binary from releases(https://github.com/mattkasun/timetrace-gui/releases)
 
 Copy it to a directory in your path.  Run timetrace-gui and point your browser at localhost:8090.
+
+
+### Docker
+`docker run --name timetrace-gui -p 8090:8090 -v $HOME/timetrace/data:/root/.timetrace nusak/timetrace-gui:v0.0.2`
+
+**:warning: warning**
+the data in $HOME/timetrace/data will be owned by root.  
+
+[![Deploy to DO](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/mattkasun/timetrace-gui/tree/master)
 
 
 ## Usage
@@ -56,7 +46,7 @@ Port forwarding or setting up a reverse proxy to enable access from the intenet 
 ![phone](https://github.com/mattkasun/timetrace-gui/raw/master/screenshots/mobile.png "TimeTrace-GUI with Phone")
 
 ## RoadMap
-- [ ] Build binaries for all architectues
+- [x] Build binaries for all architectues
 - [ ] Restore deleted projects
 - [ ] Edit project
 - [ ] Edit record
