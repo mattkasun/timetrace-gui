@@ -1,0 +1,17 @@
+name: timetrace
+region: tor
+services:
+- http_port: 8090
+  image:
+    registry_type: DOCKER_HUB
+    registry: nusak
+    repository: timetrace-gui
+    tag: v0.0.1
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  name: timetrace
+  routes:
+   - path: /
+  source_dir: /
+
+       
