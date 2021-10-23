@@ -1,0 +1,141 @@
+{{define "Header"}}
+{{template "Leftsidebar" .}}
+{{template "Rightsidebar" .}}
+{{template "HeaderIcons" }}
+{{template "HeaderModals" .}}
+
+{{end}}
+
+{{define "Leftsidebar"}}
+<div class=w3-hide-large>
+	<div id="leftsidebar" class="w3-sidebar w3-bar-block w3-card w3-animate-left w3-hide-large" style="left:0;width:200px;display:none;">
+		<button class="w3-bar-item w3-button w3-large w3-hide-large" onclick="document.getElementById('leftsidebar').style.display='none'">Close &times;</button>
+		{{template "SidebarContent" .}}
+	</div>
+</div>
+{{end}}
+
+{{define "SidebarContent"}}
+<button class="w3-btn w3-padding-24 w3-block w3-left-align hide-small" style="size=30%">Project to Track</button>
+{{range .Projects }}
+<form action="/" method=post>
+	<input type=hidden name=action value=start>
+	<input type=hidden name=project value={{.Key}}>
+	<button class="w3-button w3-block w3-left-align" type=submit>* {{.Key}}</button>
+</form>
+{{end}}
+{{end}}
+
+{{define "Rightsidebar"}}
+<div id=rightsidebar class="w3-sidebar w3-bar-block w3-card w3-animate-right" style="display:none;right:0;">
+	<button class="w3-bar-item w3-button" onclick="document.getElementById('rightsidebar').style.display='none'">Close &times;</button>
+	<button class="w3-bar-item w3-button disabled">Projects ...</button>
+	<button class="w3-bar-item w3-button" onclick="document.getElementById('newproject').style.display='block'">-- New Project</button>
+	<button class="w3-bar-item w3-button" onclick="document.getElementById('deleteproject').style.display='block'">-- Delete Project</button>
+	<button class="w3-bar-item w3-button" onclick="document.getElementById('editproject').style.display='block'">-- Edit Project</button>
+	<button class="w3-bar-item w3-button" onclick="document.location='/logout';">Logout</a>
+	<button class="w3-bar-item w3-button" onclick="document.getElementById('About').style.display='block'">About</button>
+</div>
+{{end}}
+
+{{define "HeaderIcons"}}
+<div class="w3-blue" >
+	<button class="w3-hide-large w3-button w3-blue w3-small w3-left" onclick="document.getElementById('leftsidebar').style.display='block';">Project to track &#9776;</button>
+	<button class="w3-button w3-blue w3-small w3-right" onclick="document.getElementById('rightsidebar').style.display='block';">Menu &#9776;</button>
+	<center><img src="images/timetrace.png" alt="Timetrace" ></center> 
+</div>
+	{{end}}
+
+	{{define "HeaderModals"}}
+	{{/*About */}}
+	<div id="About" class=w3-modal>
+		<div class="w3-modal-content w3-card-4 w3-animate-zoom w3-padding" style="width:50%">
+			<div class="w3-container w3-center">
+				<h2>TimeTraceGui</h2>
+				<small>Version 0.0.1</small>
+				<h3>©2021 Matthew R Kasun</h3>
+				<a href='mailto://mkasun@nusak.ca?subject=timetrace-gui'>mkasun@nusak.ca</a><br>
+				<a href='https://github.com/mattkasun/timetrace-gui' target='_blank'>github.com/mattkasun/timetrace-gui</a>
+				<br><br>
+				<button class="w3-button w3-teal w3-block w3-padding" onclick="document.getElementById('About').style.display='none'">Close</button>
+			</div>
+		</div>
+	</div>
+
+
+	{{/*NewProject*/}}
+	<div id="newproject" class="w3-modal">
+		<div class="w3-modal-content w3-card-4 animate-zoom w3-padding" style="max-width:660px">
+			<div class="w3-center"><br>
+				<span onclick="document.getElementById('newproject').style.display='none'" class="w3-button w3-xlarge w3-hover-red w3-display-topright" title="Close Modal">&times;</span>
+
+				<form class="w3-container" method=POST action="/create_project">
+					<div class="w3-section">
+						<label><b>Project Name</b></label>
+						<input class="w3-input w3-border w3-margin-bottom" type="text" placeholder="project" name="name" required>
+						<button class="w3-button w3-block w3-green w3-section w3-padding" type="submit">Create Project</button>
+					</div>
+				</form>
+
+				<div class="w3-container w3-border-top w3-padding-16 w3-light-grey">
+					<button onclick="document.getElementById('newproject').style.display='none'" type="button" class="w3-button w3-red">Cancel</button>
+
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+
+	{{/*DeleteProject*/}}
+	<div id="deleteproject" class="w3-modal">
+		<div class="w3-modal-content w3-card-4 animate-zoom w3-padding" style="max-width:660px">
+			<div class="w3-center"><br>
+				<span onclick="document.getElementById('deleteproject').style.display='none'" class="w3-button w3-xlarge w3-hover-red w3-display-topright" title="Close Modal">&times;</span>
+				<h1> Delete Project </h1>
+				<form class="w3-container" method=POST action="/delete_project">
+					<select class="w3-select w3-border" name="project">
+						{{range .Projects}}
+						<option value={{.Key}}>{{.Key}}</option>
+						{{ end }}
+					</select>
+					<input type=checkbox name=records checked>Delete All records
+					<button class="w3-button w3-block w3-green w3-section w3-padding" type="submit">Delete Project</button>
+				</form>
+
+				<div class="w3-container w3-border-top w3-padding-16 w3-light-grey">
+					<button onclick="document.getElementById('deleteproject').style.display='none'" type="button" class="w3-button w3-red">Cancel</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	{{/*EditProject*/}}
+	<div id="editproject" class="w3-modal">
+		<div class="w3-modal-content w3-card-4 animate-zoom w3-padding" style="max-width:660px">
+			<div class="w3-center"><br>
+				<span onclick="document.getElementById('editproject').style.display='none'" class="w3-button w3-xlarge w3-hover-red w3-display-topright" title="Close Modal">&times;</span>
+
+				<form class="w3-container" method=POST action="/create_project">
+					<div class="w3-section">
+						<label><b>Project Name</b></label>
+						<input class="w3-input w3-border w3-margin-bottom" type="text" placeholder="project" name="name" required>
+						<button class="w3-button w3-block w3-green w3-section w3-padding" type="submit">Edit Project</button>
+					</div>
+				</form>
+
+				<div class="w3-container w3-border-top w3-padding-16 w3-light-grey">
+					<button onclick="document.getElementById('editproject').style.display='none'" type="button" class="w3-button w3-red">Cancel</button>
+
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+
+
+	{{end}}
+
+
