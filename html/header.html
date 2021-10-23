@@ -8,7 +8,7 @@
 
 {{define "Leftsidebar"}}
 <div class=w3-hide-large>
-	<div id="leftsidebar" class="w3-sidebar w3-bar-block w3-card w3-animate-left w3-hide-large" style="left:0;width:200px">
+	<div id="leftsidebar" class="w3-sidebar w3-bar-block w3-card w3-animate-left w3-hide-large" style="left:0;width:200px;display:none;">
 		<button class="w3-bar-item w3-button w3-large w3-hide-large" onclick="document.getElementById('leftsidebar').style.display='none'">Close &times;</button>
 		{{template "SidebarContent" .}}
 	</div>
