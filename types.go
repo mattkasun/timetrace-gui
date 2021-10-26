@@ -9,6 +9,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type Report struct {
+	Project string
+	Records []core.Record
+	Total   time.Duration
+	Sum     string
+}
+
 type Users struct {
 	Username string
 	Password string

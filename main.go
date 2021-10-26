@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/dominikbraun/timetrace/config"
 	"github.com/dominikbraun/timetrace/core"
@@ -23,6 +24,10 @@ var icon embed.FS
 //go:embed html/* images/*
 var f embed.FS
 
+func PrintDuration(d time.Duration) string {
+	return fmt.Sprintf("%s", d)
+}
+
 func main() {
 	config := config.Get()
 	file := fs.New(config)
@@ -32,6 +37,9 @@ func main() {
 }
 
 func SetupRouter() *gin.Engine {
+	funcMap := template.FuncMap{
+		"printDuration": PrintDuration,
+	}
 	store := memstore.NewStore([]byte("secret"))
 	session := sessions.Sessions("timetrace", store)
 	options := sessions.Options{MaxAge: 7200}
@@ -39,7 +47,7 @@ func SetupRouter() *gin.Engine {
 	router := gin.Default()
 	router.Use(session)
 	//router.LoadHTMLGlob("html/*")
-	templates := template.Must(template.New("").ParseFS(f, "html/*"))
+	templates := template.Must(template.New("").Funcs(funcMap).ParseFS(f, "html/*"))
 	router.SetHTMLTemplate(templates)
 	//router.StaticFile("favicon.ico", "./images/favicon.ico")
 	router.StaticFS("/favicon.ico", http.FS(icon))
@@ -57,6 +65,7 @@ func SetupRouter() *gin.Engine {
 		restricted.POST("/", StartStop)
 		restricted.POST("/create_project", CreateProject)
 		restricted.POST("/delete_project", DeleteProject)
+		restricted.POST("/reports", GenerateReport)
 	}
 
 	return router
