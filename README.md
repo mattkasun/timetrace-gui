@@ -50,7 +50,7 @@ Port forwarding or setting up a reverse proxy to enable access from the intenet 
 - [ ] Restore deleted projects
 - [ ] Edit project
 - [ ] Edit record
-- [ ] Reports
+- [x] Reports
 - [ ] Edit Configuration
 - [ ] Users
 - [ ] Docker without permission issues
