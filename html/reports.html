@@ -1,17 +1,17 @@
 {{define "Reports" }}
 <div id="reports" class="w3-modal"> 
 	<div class="w3-modal-content w3-card animate-zoom w3-padding" style="max-width:660px">
+			<div class="w3-center">
+		<form class="w3-container" action="/reports" method=POST>
 		<label> Reports </label>
-		<form method=POST action="/reports">
-			<p>Start Date<p>
-			<input type=date name=start>
-			<p>End Date<p>
-			<input type=date name=end>
-			<p>Only Billable<p>
-			<input type=checkbox name=billable>
-			<p>Only NonBillable<p>
-			<input type=checkbox name=nonbillable>
-			<p>Limit to Project<p>
+			<p>Start Date</p>
+			<input type=date name=start required>
+			<p>End Date</p>
+			<input type=date name=end required>
+			<p><input type=radio name=billable value=billable><label>Billable Only</label></p>
+			<p><input type=radio name=billable value=nobillable><label>Non-Billable Only</label></p>
+			<p><input type=radio name=billable value=both checked><Label>All Records</label></p>
+			<p>Limit to Project</p>
 			<select class="w3-select w3-border" name=project>
 				<option value=""> </option>
 			{{range .Projects}}
@@ -24,8 +24,37 @@
 		<button onclick="document.getElementById('reports').style.display='none'" type="button" class="w3-button w3-red">Cancel</button>
 		</div>
 	</div>
+	</div>
 </div>
 {{end}}
+
+{{define "ReportData"}}
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://www.w3schools.com/lib/w3.css" type="text/css">
+	</head>
+	 <body onLoad="document.getElementById('Report').style.display='block';">
+	{{ template "Header" }}
+	<div id="Report" class=w3-modal>
+		<div class="w3-modal-content w3-card w3-padding" style="width:50%">
+		<h2> TimeTrace Report</h2>
+		{{ range . }}
+		<h3>Project: {{ .Project }}</h3>
+		{{range .Records }}
+		<h5> Start:{{.Start.Format "Jan 02, 2006 15:04:05 UTC" }} End:{{ .End.Format "Jan 02, 2006 15:04:05 UTC"}} Billable:{{.IsBillable}}</h4>
+		{{end}}
+		<h4> Totals: {{ .Sum }}</h4>
+		{{ end}}
+		<button class=w3-button onclick="location.href='/';"> Close</button> 
+		</div>
+	</div>
+	</body>
+</html>
+{{ end}}
+
+
+
 
 
 	

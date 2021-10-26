@@ -204,3 +204,77 @@ func CheckPassword(plain, hash Users) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash.Password), []byte(plain.Password))
 	return err == nil
 }
+
+func ProcessError(c *gin.Context, err error, status int) {
+	session := sessions.Default(c)
+	session.Set("message", err.Error())
+	session.Save()
+	location := url.URL{Path: "/"}
+	c.Redirect(status, location.RequestURI())
+}
+
+func GenerateReport(c *gin.Context) {
+	var startDate, endDate time.Time
+	var err error
+	session := sessions.Default(c)
+	start := c.PostForm("start")
+	end := c.PostForm("end")
+	billable := c.PostForm("billable")
+	project := c.PostForm("project")
+
+	startDate, err = timetrace.Formatter().ParseDate(start)
+	if err != nil {
+		ProcessError(c, err, http.StatusBadRequest)
+	}
+	//set up filters
+	endDate, err = timetrace.Formatter().ParseDate(end)
+	if err != nil {
+		ProcessError(c, err, http.StatusBadRequest)
+	}
+	var filter = []func(*core.Record) bool{
+		core.FilterNoneNilEndTime,
+		core.FilterByTimeRange(startDate, endDate),
+	}
+	if project != "" {
+		filter = append(filter, core.FilterByProject(project))
+	}
+	if billable == "billable" {
+		filter = append(filter, core.FilterBillable(true))
+	}
+	if billable == "nonbillable" {
+		filter = append(filter, core.FilterBillable(false))
+	}
+	//get raw report
+	raw, err := timetrace.Report(filter...)
+	if err != nil {
+		ProcessError(c, err, http.StatusInternalServerError)
+	}
+	//convert raw report to Indented JSON (some fields of raw not exported
+	output, err := raw.Json()
+	if err != nil {
+		ProcessError(c, err, http.StatusInternalServerError)
+	}
+	var rawdata = make(map[string]interface{})
+	err = json.Unmarshal(output, &rawdata)
+	if err != nil {
+		ProcessError(c, err, http.StatusInternalServerError)
+	}
+	var reports []Report
+	for key, record := range rawdata {
+		jsonbody, err := json.Marshal(record)
+		if err != nil {
+			ProcessError(c, err, http.StatusInternalServerError)
+		}
+		var report Report
+		err = json.Unmarshal(jsonbody, &report)
+		if err != nil {
+			ProcessError(c, err, http.StatusInternalServerError)
+		}
+		report.Project = key
+		report.Sum = timetrace.Formatter().FormatDuration(report.Total)
+		reports = append(reports, report)
+	}
+	session.Set("message", "")
+	session.Save()
+	c.HTML(http.StatusOK, "ReportData", reports)
+}
