@@ -3,9 +3,10 @@ module github.com/mattkasun/timetrace-gui
 go 1.16
 
 require (
-	github.com/dominikbraun/timetrace v0.13.1-0.20210914065520-ccea76d2b66e
+	github.com/dominikbraun/timetrace v0.14.2
 	github.com/gin-contrib/sessions v0.0.3
 	github.com/gin-gonic/gin v1.7.4
 	github.com/go-playground/validator/v10 v10.5.0 // indirect
-	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
+	github.com/matryer/is v1.4.0
+	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5
 )

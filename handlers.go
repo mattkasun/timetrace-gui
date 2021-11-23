@@ -47,7 +47,7 @@ func StartStop(c *gin.Context) {
 				err = timetrace.Stop()
 			}
 		}
-		err = timetrace.Start(project, true)
+		err = timetrace.Start(project, true, []string{})
 
 	} else if action == "stop" {
 		err = timetrace.Stop()
