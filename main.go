@@ -73,10 +73,6 @@ func SetupRouter() *gin.Engine {
 
 func AuthRequired(c *gin.Context) {
 	session := sessions.Default(c)
-	options := session.Options
-
-	fmt.Println("checking authorization\n", options)
-	fmt.Printf("type %T value %s\n", options, options)
 	loggedIn := session.Get("loggedIn")
 	fmt.Println("loggedIn status: ", loggedIn)
 	if loggedIn != true {
