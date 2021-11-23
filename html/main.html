@@ -9,6 +9,7 @@
 				<label >{{.CurrentProjectTime}}</label><br></li>
 	</ul>
 {{ if .Tracking }}
+  <form action="/" method=Post>
 		<input type=hidden name=action value=stop>
 		<button class="w3-button" type=submit><span class="material-icons-two-tone">timer_off</span> Stop</button>
 	</form>
