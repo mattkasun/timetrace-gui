@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/dominikbraun/timetrace v0.14.2
-	github.com/gin-contrib/sessions v0.0.3
+	github.com/gin-contrib/sessions v0.0.4
 	github.com/gin-gonic/gin v1.7.4
 	github.com/go-playground/validator/v10 v10.5.0 // indirect
 	github.com/matryer/is v1.4.0
