@@ -41,7 +41,9 @@ jobs:
           context: .
           platforms: linux/amd64, linux/arm64
           push: true
-          tags: nusak/timetrace-gui:${{ env.TAG }}
+          tags: |
+              nusak/timetrace-gui:${{ env.TAG }}
+              nusak/timetrace-gui:latest
   docker-combined:
     runs-on: ubuntu-latest
     steps:
@@ -76,7 +78,9 @@ jobs:
           context: .
           platforms: linux/amd64, linux/arm64
           push: true
-          tags: nusak/timetrace-combined:${{ env.TAG }}
+          tags: |
+              nusak/timetrace-combined:${{ env.TAG }}
+              nusak/timetrace-combined:latest
           file: Dockerfile.combined
           build-args: |
               VERSION=${{ env.TAG}}
