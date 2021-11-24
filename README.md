@@ -16,6 +16,7 @@ You can use timetrace-gui and timetrace at the same time if you use the native b
   - freepngimg.com/
 
 ## Installation
+
 ### Docker
 - GUI only:  
   - `docker run --name timetrace-gui -p 8090:8090 -v $HOME/timetrace/data:/root/.timetrace nusak/timetrace-gui:latest`
@@ -39,6 +40,7 @@ Download the appropriate binary from releases
 Extract it to a directory in your path.  Run timetrace-gui and point your browser at localhost:8090.
 
 
+
 ## Usage
 Run the timetrace binary (or docker container) and point your browser at localhost:8090.
 
@@ -54,11 +56,12 @@ Port forwarding or setting up a reverse proxy to enable access from the intenet 
 ![phone](https://github.com/mattkasun/timetrace-gui/raw/master/screenshots/mobile.png "TimeTrace-GUI with Phone")
 
 ## RoadMap
-- [X] Build binaries for all architectues
+
+- [x] Build binaries for all architectues
 - [ ] Restore deleted projects
 - [ ] Edit project
 - [ ] Edit record
-- [X] Reports
+- [x] Reports
 - [ ] Edit Configuration
 - [ ] Users
 
