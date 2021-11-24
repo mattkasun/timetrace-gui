@@ -79,5 +79,5 @@ jobs:
           tags: nusak/timetrace-combined:${{ env.TAG }}
           file: Dockerfile.combined
           build-args: |
-              VERSION: ${{ env.TAG}}
-              VER: ${{ env.VER}}
+              VERSION=${{ env.TAG}}
+              VER=${{ env.VER}}
