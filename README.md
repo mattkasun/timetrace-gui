@@ -4,7 +4,7 @@ Timetrace (https://github.com/dominikbraun/timetrace) is an excellent cli tool f
 
 One option would be to run timetrace in termux (https://github.com/termux/termux-app) on your phone but I decided to build a web front end to timetrace that can be accessed from a web browser on your phone or desktop.
 
-You can use timetrace-gui and timetrace at the same time if you use the native binary. Commands entered in one tool will show up in the other. :warning: not true if you use docker :warning:
+You can use timetrace-gui and timetrace at the same time if you use the native binary. Commands entered in one tool will show up in the other. 
 
 - Language 
   - go with html/templates
@@ -16,19 +16,29 @@ You can use timetrace-gui and timetrace at the same time if you use the native b
   - freepngimg.com/
 
 ## Installation
-### Native binary
-Download the appropriate binary from releases(https://github.com/mattkasun/timetrace-gui/releases)
-
-Copy it to a directory in your path.  Run timetrace-gui and point your browser at localhost:8090.
-
 
 ### Docker
-`docker run --name timetrace-gui -p 8090:8090 -v $HOME/timetrace/data:/root/.timetrace nusak/timetrace-gui:v0.0.2`
+- GUI only:  
+  - `docker run --name timetrace-gui -p 8090:8090 -v $HOME/timetrace/data:/root/.timetrace nusak/timetrace-gui:latest`
+  - GUI available at localhost:8090 
 
-**:warning: warning**
-the data in $HOME/timetrace/data will be owned by root.  
+- GUI and timetrace:
+  - `cd compose; docker-compose up -d`
+  - GUI available at localhost:8090 
+  - timetrace commands `docker exec timetrace timetrace <timetrace command and flags>` 
+    - `docker exec timetrace timetrace version` or `docker exec timetrace timetrace status`
 
-[![Deploy to DO](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/mattkasun/timetrace-gui/tree/master)
+
+### Native binary
+Download the appropriate binary from releases
+- x86 
+- i386 
+- windows 
+- mac 
+- arm64 (pi4) 
+
+Extract it to a directory in your path.  Run timetrace-gui and point your browser at localhost:8090.
+
 
 
 ## Usage
@@ -46,6 +56,7 @@ Port forwarding or setting up a reverse proxy to enable access from the intenet 
 ![phone](https://github.com/mattkasun/timetrace-gui/raw/master/screenshots/mobile.png "TimeTrace-GUI with Phone")
 
 ## RoadMap
+
 - [x] Build binaries for all architectues
 - [ ] Restore deleted projects
 - [ ] Edit project
@@ -53,4 +64,4 @@ Port forwarding or setting up a reverse proxy to enable access from the intenet 
 - [x] Reports
 - [ ] Edit Configuration
 - [ ] Users
-- [ ] Docker without permission issues
+

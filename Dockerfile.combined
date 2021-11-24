@@ -1,0 +1,27 @@
+FROM golang:latest as builder
+ARG VERSION=dev
+WORKDIR /timetrace-gui
+
+COPY *.go ./
+COPY go.* ./
+ADD /images/* images/
+ADD /html/* html/
+RUN CGO_ENABLED=0 GOOS=linux go build -mod=mod -a -ldflags "-extldflags '-static' -X 'main.version=${VERSION}'" .
+
+FROM golang:latest as build2
+ARG VER=dev
+WORKDIR /
+RUN git clone --depth 1 --branch "$VER" https://github.com/dominikbraun/timetrace.git
+RUN cd /timetrace; CGO_ENABLED=0 GOOS=linux go build -mod=mod -a -ldflags "-extldflags '-static' -X 'main.version=$VER'" .
+
+FROM busybox
+WORKDIR /root/
+COPY --from=builder /timetrace-gui/timetrace-gui /bin/
+COPY --from=build2 /timetrace/timetrace /bin/
+ADD /images/* images/
+ADD /html/* html/
+RUN mkdir -p .timetrace/projects
+RUN mkdir -p .timetrace/records
+RUN mkdir -p .timetrace/reports
+CMD ["/bin/timetrace-gui"]
+

@@ -9,6 +9,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var version = "v0.1"
+
 type Report struct {
 	Project string
 	Records []core.Record
@@ -29,6 +31,7 @@ type ProjectTime struct {
 
 type PageData struct {
 	Page               string
+	Version            string
 	Message            string
 	Tracking           bool
 	CurrentProject     string
@@ -44,6 +47,7 @@ func (data *PageData) Init(page string, c *gin.Context) {
 	session := sessions.Default(c)
 	data.Message = session.Get("message").(string)
 	data.Page = page
+	data.Version = version
 	data.CurrentProject = "---"
 	data.CurrentSession = "---"
 	data.CurrentProjectTime = "---"

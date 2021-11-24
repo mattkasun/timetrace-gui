@@ -1,0 +1,14 @@
+version: "3.4"
+
+services:
+    timetrace:
+        container_name: combined
+        image: nusak/timetrace-combined:v0.1.1
+        restart: unless-stopped
+        volumes:
+            - timetrace:/root/.timetrace
+        ports:
+            - "8090:8090"
+volumes:
+    timetrace: {}
+
