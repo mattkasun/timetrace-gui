@@ -1,10 +1,11 @@
 #!/bin/bash
 if [ -z "$1" ]
 then
-    TAG=$1
-else
     TAG="testing"
+else
+    TAG=$1
 fi
+echo $TAG 
 
 VERSION=`curl -fsSLI -o /dev/null -w %{url_effective} https://github.com/mattkasun/timetrace-gui/releases/latest | awk -F/ '{print $8}'`
 echo $VERSION

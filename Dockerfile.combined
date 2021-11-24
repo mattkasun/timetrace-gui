@@ -11,7 +11,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -mod=mod -a -ldflags "-extldflags '-static
 FROM golang:latest as build2
 ARG VER=dev
 WORKDIR /
-RUN git clone https://github.com/dominikbraun/timetrace.git
+RUN git clone --depth 1 --branch "$VER" https://github.com/dominikbraun/timetrace.git
 RUN cd /timetrace; CGO_ENABLED=0 GOOS=linux go build -mod=mod -a -ldflags "-extldflags '-static' -X 'main.version=$VER'" .
 
 FROM busybox
