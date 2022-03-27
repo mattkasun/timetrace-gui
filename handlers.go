@@ -42,12 +42,17 @@ func StartStop(c *gin.Context) {
 			//no need to track time of less than minute and allow creation of new record
 			if page.CurrentSession == "0h 0min" {
 				record, err = timetrace.LoadRecord(time.Now())
-				err = timetrace.DeleteRecord(*record)
-			} else {
-				err = timetrace.Stop()
+				if err != nil {
+					fmt.Println("------errors ", err)
+				}
+				if err := timetrace.DeleteRecord(*record); err != nil {
+					fmt.Println("------errors ", err)
+				} else if err := timetrace.Stop(); err != nil {
+					fmt.Println("------errors ", err)
+				}
 			}
+			err = timetrace.Start(project, true, []string{})
 		}
-		err = timetrace.Start(project, true, []string{})
 
 	} else if action == "stop" {
 		err = timetrace.Stop()
@@ -194,10 +199,8 @@ func ValidateUser(visitor Users) (bool, bool, error) {
 			}
 			return true, false, nil
 		}
-		return false, false, errors.New("Invalid username or password")
 	}
-	//shouldn't get here
-	return false, false, nil
+	return false, false, errors.New("invalid username or password")
 }
 
 func CheckPassword(plain, hash Users) bool {
