@@ -41,6 +41,7 @@ type PageData struct {
 	Breaks             string
 	Projects           []*core.Project
 	Summary            map[string]string
+	DefaultDate        string
 }
 
 func (data *PageData) Init(page string, c *gin.Context) {
@@ -52,6 +53,7 @@ func (data *PageData) Init(page string, c *gin.Context) {
 	data.CurrentSession = "---"
 	data.CurrentProjectTime = "---"
 	data.Tracking = false
+	data.DefaultDate = time.Now().Local().Format("2006-01-02")
 	status, err := timetrace.Status()
 	fmt.Println("error: ", err)
 	if err == nil {

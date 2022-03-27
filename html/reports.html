@@ -5,9 +5,9 @@
 		<form class="w3-container" action="/reports" method=POST>
 		<label> Reports </label>
 			<p>Start Date</p>
-			<input type=date name=start required>
+			<input type=date name=start value={{.DefaultDate}} required>
 			<p>End Date</p>
-			<input type=date name=end required>
+			<input type=date name=end value="{{.DefaultDate}}" required>
 			<p><input type=radio name=billable value=billable><label>Billable Only</label></p>
 			<p><input type=radio name=billable value=nobillable><label>Non-Billable Only</label></p>
 			<p><input type=radio name=billable value=both checked><Label>All Records</label></p>
