@@ -95,9 +95,7 @@ func (data *PageData) Init(page string, c *gin.Context) {
 	//get all projects
 	data.Projects, err = timetrace.ListProjects()
 	if err != nil {
+		fmt.Println("error retrieving projects", err)
 		data.Projects = []*core.Project{}
 	}
-
-	fmt.Println(data.Projects)
-
 }

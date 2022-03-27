@@ -43,15 +43,17 @@ func StartStop(c *gin.Context) {
 			if page.CurrentSession == "0h 0min" {
 				record, err = timetrace.LoadRecord(time.Now())
 				if err != nil {
-					fmt.Println("------errors ", err)
+					fmt.Println("load record err ", err)
 				}
 				if err := timetrace.DeleteRecord(*record); err != nil {
-					fmt.Println("------errors ", err)
+					fmt.Println("delete record errors ", err)
 				} else if err := timetrace.Stop(); err != nil {
-					fmt.Println("------errors ", err)
+					fmt.Println("stop errors ", err)
 				}
 			}
-			err = timetrace.Start(project, true, []string{})
+		}
+		if err := timetrace.Start(project, true, []string{}); err != nil {
+			fmt.Println("err starting", project, err)
 		}
 
 	} else if action == "stop" {
@@ -60,7 +62,7 @@ func StartStop(c *gin.Context) {
 		err = errors.New("invalid request")
 	}
 	if err != nil {
-		fmt.Println("------errors ", err)
+		fmt.Println("stop command errors ", err)
 		session.Set("message", err.Error())
 	} else {
 		session.Set("message", "")
