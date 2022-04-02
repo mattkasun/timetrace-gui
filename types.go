@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var version = "v0.1"
+var version = "v0.3"
 
 type Report struct {
 	Project string

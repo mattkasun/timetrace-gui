@@ -283,3 +283,62 @@ func GenerateReport(c *gin.Context) {
 	session.Save()
 	c.HTML(http.StatusOK, "ReportData", reports)
 }
+
+func EditRecord(c *gin.Context) {
+	action := c.PostForm("action")
+	if action == "update" {
+		UpdateRecord(c)
+		return
+	}
+	session := sessions.Default(c)
+	record := c.PostForm("record")
+	start, err := time.Parse("2006-01-02-15-04", record)
+	if err != nil {
+		ProcessError(c, err, http.StatusBadRequest)
+	}
+	edit, err := timetrace.LoadRecord(start)
+	if err != nil {
+		ProcessError(c, err, http.StatusBadRequest)
+	}
+	session.Set("message", "")
+	session.Save()
+	c.HTML(http.StatusOK, "EditRecord", edit)
+}
+
+func UpdateRecord(c *gin.Context) {
+	session := sessions.Default(c)
+	record := c.PostForm("record")
+	start := c.PostForm("start")
+	end := c.PostForm("end")
+	old, err := time.Parse("2006-01-02-15-04", record)
+	if err != nil {
+		ProcessError(c, err, http.StatusBadRequest)
+	}
+	edit, err := timetrace.LoadRecord(old)
+	if err != nil {
+		ProcessError(c, err, http.StatusBadRequest)
+	}
+	if err := timetrace.BackupRecord(old); err != nil {
+		ProcessError(c, err, http.StatusBadRequest)
+	}
+	if err := timetrace.DeleteRecord(*edit); err != nil {
+		ProcessError(c, err, http.StatusBadRequest)
+	}
+	edit.Start, err = time.Parse("2006-01-02-15-04-05", start)
+	if err != nil {
+		ProcessError(c, err, http.StatusBadRequest)
+	}
+	endtime, err := (time.Parse("2006-01-02-15-04-05", end))
+	if err != nil {
+		ProcessError(c, err, http.StatusBadRequest)
+	}
+	edit.End = &endtime
+	if err := timetrace.SaveRecord(*edit, true); err != nil {
+		ProcessError(c, err, http.StatusBadRequest)
+	}
+	session.Set("message", "")
+	session.Save()
+	location := url.URL{Path: "/"}
+	c.Redirect(http.StatusFound, location.RequestURI())
+
+}

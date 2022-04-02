@@ -70,6 +70,7 @@ func SetupRouter() *gin.Engine {
 		restricted.POST("/create_project", CreateProject)
 		restricted.POST("/delete_project", DeleteProject)
 		restricted.POST("/reports", GenerateReport)
+		restricted.POST("/edit", EditRecord)
 	}
 
 	return router

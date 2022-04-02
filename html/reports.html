@@ -42,7 +42,11 @@
 		{{ range . }}
 		<h3>Project: {{ .Project }}</h3>
 		{{range .Records }}
-		<h5> Start:{{.Start.Format "Jan 02, 2006 15:04:05 UTC" }} End:{{ .End.Format "Jan 02, 2006 15:04:05 UTC"}} Billable:{{.IsBillable}}</h4>
+			<form action="/edit" method=post>
+				<input type=hidden name=action value=edit>
+				<input type=hidden name=record value={{ .Start.Format "2006-01-02-15-04" }}>	
+				<button class="w3-button w3-block" type=submit>Start:{{.Start.Format "Jan 02, 2006 15:04:05" }} End:{{ .End.Format "Jan 02, 2006 15:04:05 UTC"}} Billable:{{.IsBillable}}</button>
+			</form>
 		{{end}}
 		<h4> Totals: {{ .Sum }}</h4>
 		{{ end}}
@@ -52,6 +56,33 @@
 	</body>
 </html>
 {{ end}}
+
+{{ define "EditRecord"}}
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://www.w3schools.com/lib/w3.css" type="text/css">
+	</head>
+	 <body onLoad="document.getElementById('EditRecord').style.display='block';">
+	{{ template "Header" }}
+	<div id="EditRecord" class=w3-modal>
+		<div class="w3-modal-content w3-card w3-padding" style="width:50%">
+		<h2> Edit Record</h2>
+        <form action="/edit" method=Post>
+			<input type=hidden name=action value=update>
+			<input type=hidden name=record value={{.Start.Format "2006-01-02-15-04"}}>
+			<label>start:</label>
+            <input class="w3-input w3-border" name=start type="text" value={{.Start.Format "2006-01-02-15-04-05"}}>
+			<label>end:</label>
+            <input class="w3-input w3-border" name=end type="text" value={{.End.Format "2006-01-02-15-04-05"}}>
+			<button class="w3-button w3-block w3-green w3-section w3-padding" type="submit">Submit</button>
+        </form>
+		<button class=w3-button onclick='location.href="/";'> Close</button> 
+    </div>
+    </div>
+    </body>
+</html>
+{{ end }}
 
 
 
