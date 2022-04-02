@@ -42,12 +42,19 @@ func StartStop(c *gin.Context) {
 			//no need to track time of less than minute and allow creation of new record
 			if page.CurrentSession == "0h 0min" {
 				record, err = timetrace.LoadRecord(time.Now())
-				err = timetrace.DeleteRecord(*record)
-			} else {
-				err = timetrace.Stop()
+				if err != nil {
+					fmt.Println("load record err ", err)
+				}
+				if err := timetrace.DeleteRecord(*record); err != nil {
+					fmt.Println("delete record errors ", err)
+				} else if err := timetrace.Stop(); err != nil {
+					fmt.Println("stop errors ", err)
+				}
 			}
 		}
-		err = timetrace.Start(project, true, []string{})
+		if err := timetrace.Start(project, true, []string{}); err != nil {
+			fmt.Println("err starting", project, err)
+		}
 
 	} else if action == "stop" {
 		err = timetrace.Stop()
@@ -55,7 +62,7 @@ func StartStop(c *gin.Context) {
 		err = errors.New("invalid request")
 	}
 	if err != nil {
-		fmt.Println("------errors ", err)
+		fmt.Println("stop command errors ", err)
 		session.Set("message", err.Error())
 	} else {
 		session.Set("message", "")
@@ -194,10 +201,8 @@ func ValidateUser(visitor Users) (bool, bool, error) {
 			}
 			return true, false, nil
 		}
-		return false, false, errors.New("Invalid username or password")
 	}
-	//shouldn't get here
-	return false, false, nil
+	return false, false, errors.New("invalid username or password")
 }
 
 func CheckPassword(plain, hash Users) bool {
@@ -277,4 +282,63 @@ func GenerateReport(c *gin.Context) {
 	session.Set("message", "")
 	session.Save()
 	c.HTML(http.StatusOK, "ReportData", reports)
+}
+
+func EditRecord(c *gin.Context) {
+	action := c.PostForm("action")
+	if action == "update" {
+		UpdateRecord(c)
+		return
+	}
+	session := sessions.Default(c)
+	record := c.PostForm("record")
+	start, err := time.Parse("2006-01-02-15-04", record)
+	if err != nil {
+		ProcessError(c, err, http.StatusBadRequest)
+	}
+	edit, err := timetrace.LoadRecord(start)
+	if err != nil {
+		ProcessError(c, err, http.StatusBadRequest)
+	}
+	session.Set("message", "")
+	session.Save()
+	c.HTML(http.StatusOK, "EditRecord", edit)
+}
+
+func UpdateRecord(c *gin.Context) {
+	session := sessions.Default(c)
+	record := c.PostForm("record")
+	start := c.PostForm("start")
+	end := c.PostForm("end")
+	old, err := time.Parse("2006-01-02-15-04", record)
+	if err != nil {
+		ProcessError(c, err, http.StatusBadRequest)
+	}
+	edit, err := timetrace.LoadRecord(old)
+	if err != nil {
+		ProcessError(c, err, http.StatusBadRequest)
+	}
+	if err := timetrace.BackupRecord(old); err != nil {
+		ProcessError(c, err, http.StatusBadRequest)
+	}
+	if err := timetrace.DeleteRecord(*edit); err != nil {
+		ProcessError(c, err, http.StatusBadRequest)
+	}
+	edit.Start, err = time.Parse("2006-01-02-15-04-05", start)
+	if err != nil {
+		ProcessError(c, err, http.StatusBadRequest)
+	}
+	endtime, err := (time.Parse("2006-01-02-15-04-05", end))
+	if err != nil {
+		ProcessError(c, err, http.StatusBadRequest)
+	}
+	edit.End = &endtime
+	if err := timetrace.SaveRecord(*edit, true); err != nil {
+		ProcessError(c, err, http.StatusBadRequest)
+	}
+	session.Set("message", "")
+	session.Save()
+	location := url.URL{Path: "/"}
+	c.Redirect(http.StatusFound, location.RequestURI())
+
 }

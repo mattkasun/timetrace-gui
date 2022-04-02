@@ -4,6 +4,7 @@ import (
 	"embed"
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -25,13 +26,16 @@ var icon embed.FS
 var f embed.FS
 
 func PrintDuration(d time.Duration) string {
-	return fmt.Sprintf("%s", d)
+	return fmt.Sprint(d)
 }
 
 func main() {
 	config := config.Get()
 	file := fs.New(config)
 	timetrace = core.New(config, file)
+	if err := timetrace.EnsureDirectories(); err != nil {
+		log.Fatal("unable to create dirs", err)
+	}
 	router := SetupRouter()
 	router.Run(":8090")
 }
@@ -66,6 +70,7 @@ func SetupRouter() *gin.Engine {
 		restricted.POST("/create_project", CreateProject)
 		restricted.POST("/delete_project", DeleteProject)
 		restricted.POST("/reports", GenerateReport)
+		restricted.POST("/edit", EditRecord)
 	}
 
 	return router
