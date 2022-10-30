@@ -1,0 +1,15 @@
+[Unit]
+Description=Timetrace GUI
+Documentation=https://github.com/mattkasun/timetrace-gui
+After=network-online.target
+Wants=network-online.target systemd-networkd-wait-online.service
+
+[Service]
+User=root
+Type=simple
+ExecStart=/bin/timetrace-gui
+Restart=on-failure
+RestartSec=15s
+
+[Install]
+WantedBy=multi-user.target
