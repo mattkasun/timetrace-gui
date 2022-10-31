@@ -7,12 +7,13 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"time"
 
 	"github.com/dominikbraun/timetrace/core"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/mattkasun/timetrace-gui/database"
+	"github.com/mattkasun/timetrace-gui/models"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -115,22 +116,27 @@ func DeleteProject(c *gin.Context) {
 }
 
 func NewUser(c *gin.Context) {
-	var user Users
+	var user models.User
+	var err error
 	user.Username = c.PostForm("user")
-	user.Password = c.PostForm("pass")
-	user.IsAdmin = true
-	if err := SaveUser(user); err != nil {
+	password := c.PostForm("pass")
+	user.Admin = true
+	user.Password, err = hashPassword(password)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err})
+		return
+	}
+	if err := SaveUser(&user); err != nil {
 		log.Fatal("err saving user: ", err)
 	}
-
 	c.HTML(http.StatusOK, "Login", nil)
 }
 
 func ProcessLogin(c *gin.Context) {
-	var user Users
+	var user models.User
 	user.Username = c.PostForm("user")
 	user.Password = c.PostForm("pass")
-	valid, isadmim, err := ValidateUser(user)
+	valid, isadmim, err := ValidateUser(&user)
 	if err != nil {
 		c.HTML(http.StatusBadRequest, "Login", gin.H{"message": err.Error()})
 	}
@@ -161,51 +167,26 @@ func hashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
-func SaveUser(user Users) error {
-	home := os.Getenv("HOME")
-	f, err := os.Create(home + "/.timetrace/users.json")
-	if err != nil {
-		return err
-	}
-	user.Password, err = hashPassword(user.Password)
-	if err != nil {
-		return err
-	}
-	b, err := json.Marshal(user)
-	if err != nil {
-		return err
-	}
-	_, err = f.Write(b)
-	if err != nil {
-		return err
-	}
-	return nil
+func SaveUser(user *models.User) error {
+	return database.SaveUser(user)
 }
 
-func ValidateUser(visitor Users) (bool, bool, error) {
-	var user Users
-	home := os.Getenv("HOME")
-	f, err := os.Open(home + "/.timetrace/users.json")
+func ValidateUser(visitor *models.User) (bool, bool, error) {
+	user, err := database.GetUser(visitor.Username)
+
 	if err != nil {
 		return false, false, err
 	}
-	decoder := json.NewDecoder(f)
-	for decoder.More() {
-		err = decoder.Decode(&user)
-		if err != nil {
-			return false, false, err
+	if visitor.Username == user.Username && CheckPassword(visitor, &user) {
+		if user.Admin {
+			return true, true, nil
 		}
-		if visitor.Username == user.Username && CheckPassword(visitor, user) {
-			if user.IsAdmin {
-				return true, true, nil
-			}
-			return true, false, nil
-		}
+		return true, false, nil
 	}
 	return false, false, errors.New("invalid username or password")
 }
 
-func CheckPassword(plain, hash Users) bool {
+func CheckPassword(plain, hash *models.User) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash.Password), []byte(plain.Password))
 	return err == nil
 }

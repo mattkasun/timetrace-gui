@@ -8,23 +8,23 @@ import (
 	"github.com/mattkasun/timetrace-gui/models"
 )
 
-func SaveUser(user models.User) error {
+func SaveUser(user *models.User) error {
 	user.Updated = time.Now()
 	value, err := json.Marshal(user)
 	if err != nil {
 		return err
 	}
-	return insert(user.ID.String(), string(value), USERS_TABLE_NAME)
+	return insert(user.Username, string(value), USERS_TABLE_NAME)
 }
 
-func GetUser(id string) (models.User, error) {
+func GetUser(name string) (models.User, error) {
 	var user models.User
 	records, err := fetch(USERS_TABLE_NAME)
 	if err != nil {
 		return user, err
 	}
 	for key, record := range records {
-		if key == id {
+		if key == name {
 			if err := json.Unmarshal([]byte(record), &user); err != nil {
 				return user, err
 			}
@@ -50,6 +50,6 @@ func GetAllUsers() ([]models.User, error) {
 	return users, nil
 }
 
-func DeleteUser(id string) error {
-	return delete(id, USERS_TABLE_NAME)
+func DeleteUser(name string) error {
+	return delete(name, USERS_TABLE_NAME)
 }
