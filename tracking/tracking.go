@@ -156,5 +156,21 @@ func BackupProject(name string) error {
 }
 
 func DeleteRecordsByProject(name string) error {
+	failures := false
+	rows, err := database.GetAllrecords()
+	if err != nil {
+		return err
+	}
+	for _, row := range rows {
+		if row.Project == name {
+			if err := database.DeleteRecord(row.ID.String()); err != nil {
+				failures = true
+				log.Println("error deleting record", err)
+			}
+		}
+	}
+	if failures {
+		return errors.New("all records were not deleted")
+	}
 	return nil
 }

@@ -1,2 +1,4 @@
 timetrace-gui
+timetrace.db
+.vscode/*
 dist/
