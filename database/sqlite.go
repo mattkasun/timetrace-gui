@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -100,6 +101,16 @@ func sqInsert(key, value, table string) error {
 }
 
 func sqDeleteRecord(id, table string) error {
+	query := fmt.Sprintf("DELETE FROM %s WHERE KEY = '%s'", table, id)
+	statement, err := db.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+	if _, err := statement.Exec(); err != nil {
+		return err
+	}
+	log.Printf("deleted %s from %s\n", id, table)
 	return nil
 }
 
