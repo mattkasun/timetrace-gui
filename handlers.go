@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -9,11 +8,13 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/dominikbraun/timetrace/core"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"github.com/kr/pretty"
 	"github.com/mattkasun/timetrace-gui/database"
 	"github.com/mattkasun/timetrace-gui/models"
+	"github.com/mattkasun/timetrace-gui/tracking"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -23,6 +24,7 @@ func DisplayLanding(c *gin.Context) {
 	//options := session.Options
 	//fmt.Println("---------options", &options.MaxAge)
 	page.Init("main", c)
+	pretty.Println(page)
 	session.Set("message", "")
 	session.Save()
 	c.HTML(http.StatusOK, "layout", page)
@@ -35,30 +37,13 @@ func StartStop(c *gin.Context) {
 	action := c.PostForm("action")
 	project := c.PostForm("project")
 	var err error
-	var record *core.Record
 	if action == "start" {
-		if page.Tracking {
-			fmt.Println("Currently Tracking ", page.CurrentProject, " need to stop first ", page.CurrentSession)
-			//need to check that current project has been tracked for at least one minute
-			//no need to track time of less than minute and allow creation of new record
-			if page.CurrentSession == "0h 0min" {
-				record, err = timetrace.LoadRecord(time.Now())
-				if err != nil {
-					fmt.Println("load record err ", err)
-				}
-				if err := timetrace.DeleteRecord(*record); err != nil {
-					fmt.Println("delete record errors ", err)
-				} else if err := timetrace.Stop(); err != nil {
-					fmt.Println("stop errors ", err)
-				}
-			}
-		}
-		if err := timetrace.Start(project, true, []string{}); err != nil {
+		if err := tracking.Start(project); err != nil {
 			fmt.Println("err starting", project, err)
 		}
 
 	} else if action == "stop" {
-		err = timetrace.Stop()
+		err = tracking.Stop()
 	} else {
 		err = errors.New("invalid request")
 	}
@@ -74,13 +59,14 @@ func StartStop(c *gin.Context) {
 }
 
 func CreateProject(c *gin.Context) {
-	var project core.Project
-	project.Key = c.PostForm("name")
+	project := models.Project{}
+	project.Name = c.PostForm("name")
+	project.ID = uuid.New()
 	session := sessions.Default(c)
-	if err := timetrace.SaveProject(project, false); err != nil {
+	if err := database.SaveProject(&project); err != nil {
 		session.Set("message", err.Error())
 	} else {
-		session.Set("message", "New Project "+project.Key+" Created")
+		session.Set("message", "New Project "+project.Name+" Created")
 	}
 	session.Save()
 	location := url.URL{Path: "/"}
@@ -88,26 +74,25 @@ func CreateProject(c *gin.Context) {
 }
 
 func DeleteProject(c *gin.Context) {
-	var project core.Project
 	success := true
-	project.Key = c.PostForm("project")
+	name := c.PostForm("project")
 	deleteRecords := c.PostForm("records")
 	session := sessions.Default(c)
-	if err := timetrace.BackupProject(project.Key); err != nil {
+	if err := tracking.BackupProject(name); err != nil {
 		session.Set("message", err.Error())
 		success = false
 	}
 	if deleteRecords == "on" && success {
-		if err := timetrace.DeleteRecordsByProject(project.Key); err != nil {
+		if err := tracking.DeleteRecordsByProject(name); err != nil {
 			session.Set("message", err.Error())
 			success = false
 		}
 	}
 	if success {
-		if err := timetrace.DeleteProject(project); err != nil {
+		if err := database.DeleteProject(name); err != nil {
 			session.Set("message", err.Error())
 		} else {
-			session.Set("message", "Project "+project.Key+" has been Deleted")
+			session.Set("message", "Project "+name+" has been Deleted")
 		}
 	}
 	session.Save()
@@ -205,64 +190,37 @@ func GenerateReport(c *gin.Context) {
 	session := sessions.Default(c)
 	start := c.PostForm("start")
 	end := c.PostForm("end")
-	billable := c.PostForm("billable")
+	//billable := c.PostForm("billable")
 	project := c.PostForm("project")
-
-	startDate, err = timetrace.Formatter().ParseDate(start)
+	startDate, err = time.Parse("2006-01-02", start)
 	if err != nil {
 		ProcessError(c, err, http.StatusBadRequest)
 	}
 	//set up filters
-	endDate, err = timetrace.Formatter().ParseDate(end)
+	endDate, err = time.Parse("2006-01-02", end)
 	if err != nil {
 		ProcessError(c, err, http.StatusBadRequest)
 	}
-	var filter = []func(*core.Record) bool{
-		core.FilterNoneNilEndTime,
-		core.FilterByTimeRange(startDate, endDate),
+	pretty.Println(start, startDate, end, endDate)
+	rows, err := database.GetAllrecords()
+	if err != nil {
+		ProcessError(c, err, http.StatusInternalServerError)
 	}
-	if project != "" {
-		filter = append(filter, core.FilterByProject(project))
-	}
-	if billable == "billable" {
-		filter = append(filter, core.FilterBillable(true))
-	}
-	if billable == "nonbillable" {
-		filter = append(filter, core.FilterBillable(false))
+	records := []models.Record{}
+	for _, row := range rows {
+		if row.Start.After(startDate) && row.Start.Before(endDate) {
+			if project != "" && row.Project != project {
+				continue
+			}
+			records = append(records, row)
+		}
 	}
 	//get raw report
-	raw, err := timetrace.Report(filter...)
-	if err != nil {
-		ProcessError(c, err, http.StatusInternalServerError)
-	}
 	//convert raw report to Indented JSON (some fields of raw not exported
-	output, err := raw.Json()
-	if err != nil {
-		ProcessError(c, err, http.StatusInternalServerError)
-	}
-	var rawdata = make(map[string]interface{})
-	err = json.Unmarshal(output, &rawdata)
-	if err != nil {
-		ProcessError(c, err, http.StatusInternalServerError)
-	}
-	var reports []Report
-	for key, record := range rawdata {
-		jsonbody, err := json.Marshal(record)
-		if err != nil {
-			ProcessError(c, err, http.StatusInternalServerError)
-		}
-		var report Report
-		err = json.Unmarshal(jsonbody, &report)
-		if err != nil {
-			ProcessError(c, err, http.StatusInternalServerError)
-		}
-		report.Project = key
-		report.Sum = timetrace.Formatter().FormatDuration(report.Total)
-		reports = append(reports, report)
-	}
 	session.Set("message", "")
 	session.Save()
-	c.HTML(http.StatusOK, "ReportData", reports)
+	pretty.Println(records)
+	c.HTML(http.StatusOK, "ReportData", records)
 }
 
 func EditRecord(c *gin.Context) {
@@ -273,11 +231,7 @@ func EditRecord(c *gin.Context) {
 	}
 	session := sessions.Default(c)
 	record := c.PostForm("record")
-	start, err := time.Parse("2006-01-02-15-04", record)
-	if err != nil {
-		ProcessError(c, err, http.StatusBadRequest)
-	}
-	edit, err := timetrace.LoadRecord(start)
+	edit, err := database.GetRecord(record)
 	if err != nil {
 		ProcessError(c, err, http.StatusBadRequest)
 	}
@@ -288,38 +242,35 @@ func EditRecord(c *gin.Context) {
 
 func UpdateRecord(c *gin.Context) {
 	session := sessions.Default(c)
-	record := c.PostForm("record")
+	id := c.PostForm("record")
 	start := c.PostForm("start")
 	end := c.PostForm("end")
-	old, err := time.Parse("2006-01-02-15-04", record)
+	record, err := database.GetRecord(id)
 	if err != nil {
 		ProcessError(c, err, http.StatusBadRequest)
 	}
-	edit, err := timetrace.LoadRecord(old)
+	record.Start, err = time.Parse("2006-01-02-15-04-05", start)
 	if err != nil {
 		ProcessError(c, err, http.StatusBadRequest)
 	}
-	if err := timetrace.BackupRecord(old); err != nil {
-		ProcessError(c, err, http.StatusBadRequest)
-	}
-	if err := timetrace.DeleteRecord(*edit); err != nil {
-		ProcessError(c, err, http.StatusBadRequest)
-	}
-	edit.Start, err = time.Parse("2006-01-02-15-04-05", start)
+	record.End, err = time.Parse("2006-01-02-15-04-05", end)
 	if err != nil {
 		ProcessError(c, err, http.StatusBadRequest)
 	}
-	endtime, err := (time.Parse("2006-01-02-15-04-05", end))
-	if err != nil {
-		ProcessError(c, err, http.StatusBadRequest)
-	}
-	edit.End = &endtime
-	if err := timetrace.SaveRecord(*edit, true); err != nil {
+	if err := database.Saverecord(&record); err != nil {
 		ProcessError(c, err, http.StatusBadRequest)
 	}
 	session.Set("message", "")
 	session.Save()
 	location := url.URL{Path: "/"}
 	c.Redirect(http.StatusFound, location.RequestURI())
+}
 
+func GetProjects(c *gin.Context) {
+	projects, err := database.GetAllProjects()
+	if err != nil {
+		ProcessError(c, err, http.StatusBadRequest)
+		return
+	}
+	c.JSON(http.StatusOK, projects)
 }

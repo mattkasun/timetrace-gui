@@ -15,7 +15,7 @@
 			<select class="w3-select w3-border" name=project>
 				<option value=""> </option>
 			{{range .Projects}}
-				<option value={{.Key}}>{{.Key}}</option>
+				<option value={{.Name}}>{{.Name}}</option>
 			{{end}}
 			</select>
 			<button class="w3-button w3-block w3-green w3-section w3-padding" type="submit">Generate Report</button>

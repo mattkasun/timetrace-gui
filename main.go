@@ -2,22 +2,18 @@ package main
 
 import (
 	"embed"
+	"errors"
 	"fmt"
 	"html/template"
 	"log"
 	"net/http"
-	"os"
 	"time"
 
-	"github.com/dominikbraun/timetrace/config"
-	"github.com/dominikbraun/timetrace/core"
-	"github.com/dominikbraun/timetrace/fs"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/memstore"
 	"github.com/gin-gonic/gin"
+	"github.com/mattkasun/timetrace-gui/database"
 )
-
-var timetrace *core.Timetrace
 
 //go:embed: images/favicon.ico
 var icon embed.FS
@@ -30,12 +26,15 @@ func PrintDuration(d time.Duration) string {
 }
 
 func main() {
-	config := config.Get()
-	file := fs.New(config)
-	timetrace = core.New(config, file)
-	if err := timetrace.EnsureDirectories(); err != nil {
-		log.Fatal("unable to create dirs", err)
+	//config := config.Get()
+	//file := fs.New(config)
+	if err := database.InitializeDatabase(); err != nil {
+		log.Fatal("could not init database ", err)
 	}
+	//timetrace = core.New(config, file)
+	//if err := timetrace.EnsureDirectories(); err != nil {
+	//log.Fatal("unable to create dirs", err)
+	//}
 	router := SetupRouter()
 	router.Run(":8090")
 }
@@ -73,6 +72,11 @@ func SetupRouter() *gin.Engine {
 		restricted.POST("/edit", EditRecord)
 	}
 
+	api := router.Group("/api/v1")
+	{
+		api.GET("/projects", GetProjects)
+	}
+
 	return router
 }
 
@@ -80,18 +84,25 @@ func AuthRequired(c *gin.Context) {
 	session := sessions.Default(c)
 	loggedIn := session.Get("loggedIn")
 	fmt.Println("loggedIn status: ", loggedIn)
+	if err := database.InitializeDatabase(); err != nil {
+		log.Println(err)
+	}
 	if loggedIn != true {
-		home := os.Getenv("HOME")
-		_, err := os.Open(home + "/.timetrace/users.json")
+		_, err := database.GetAllUsers()
 		if err != nil {
-			fmt.Println("error opening user file: ", err)
-			c.HTML(http.StatusOK, "New", gin.H{"message": err})
+			if errors.Is(err, database.ErrNoResults) {
+				//if err.Error() == "no results found" {
+				log.Println("no users", err)
+				c.HTML(http.StatusOK, "New", gin.H{"message": err})
+				c.Abort()
+				return
+			}
+			log.Println("getusers error", err)
+			c.HTML(http.StatusInternalServerError, "Login", gin.H{"message": "database err"})
 			c.Abort()
 			return
 		}
-		message := session.Get("error")
-		fmt.Println("user exists --- message\n", message)
-		c.HTML(http.StatusOK, "Login", gin.H{"messge": message})
+		c.HTML(http.StatusOK, "Login", nil)
 		c.Abort()
 		return
 	}

@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
@@ -9,6 +10,7 @@ import (
 	"path/filepath"
 
 	_ "modernc.org/sqlite"
+	//_ "github.com/mattn/go-sqlite3"
 )
 
 // SQLITE_FUNCTIONS - contains a map of the functions for sqlite
@@ -33,8 +35,10 @@ func sqInitDB() error {
 	//return errors.New("empty config file")
 	//}
 	//log.Println("initializing sqlite ", cfg.DBPath, cfg.DBFile)
-	DBPath := "/var/lib/timetrace/"
+	DBPath := "./"
+	//DBPath := "/var/lib/timetrace/"
 	DBFile := "timetrace.db"
+	var err error
 
 	if _, err := os.Stat(DBPath); os.IsNotExist(err) {
 		if err := os.MkdirAll(DBPath, 0766); err != nil {
@@ -50,25 +54,27 @@ func sqInitDB() error {
 			return err
 		}
 	}
-	db, err := sql.Open("sqlite", path)
+	db, err = sql.Open("sqlite", path)
 	if err != nil {
 		log.Println("error opening sqlite database", path, err)
 		return err
 	}
 	db.SetMaxOpenConns(1)
-	return nil
+	return db.Ping()
+	//return nil
 }
 
 func sqCreateTable(table string) error {
 	query := "CREATE TABLE IF NOT EXISTS " + table + " ( key TEXT NOT NULL UNIQUE PRIMARY KEY, value TEXT)"
-	statement, err := db.Prepare(query)
-	if err != nil {
-		log.Println("error preparing query", err)
-		return err
-	}
-	defer statement.Close()
-	_, err = statement.Exec()
-	if err != nil {
+	if _, err := db.ExecContext(context.Background(), query); err != nil {
+		//statement, err := db.Prepare(query)
+		//if err != nil {
+		//	log.Println("error preparing query", err)
+		//	return err
+		//}
+		//defer statement.Close()
+		//_, err = statement.Exec()
+		//if err != nil {
 		log.Println("error executing statement", err)
 		return err
 	}
@@ -93,12 +99,12 @@ func sqInsert(key, value, table string) error {
 	return errors.New("invalid insert " + key + " : " + value)
 }
 
-func sqDeleteRecord() {
-	return
+func sqDeleteRecord(id, table string) error {
+	return nil
 }
 
-func sqDeleteAllRecords() {
-	return
+func sqDeleteAllRecords() error {
+	return nil
 }
 
 func sqFetchRecords(table string) (map[string]string, error) {
@@ -116,7 +122,7 @@ func sqFetchRecords(table string) (map[string]string, error) {
 		records[key] = value
 	}
 	if len(records) == 0 {
-		return nil, errors.New(NO_RECORDS)
+		return nil, ErrNoResults
 	}
 	return records, nil
 }

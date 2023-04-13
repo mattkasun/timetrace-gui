@@ -1,6 +1,7 @@
 package database
 
 import (
+	"errors"
 	"log"
 )
 
@@ -21,6 +22,8 @@ const (
 	NO_RECORDS = "no results found"
 )
 
+var ErrNoResults = errors.New("no results found")
+
 func getCurrentDB() map[string]interface{} {
 	//config, _ := config.Get()
 	//switch config.DB {
@@ -35,7 +38,8 @@ func getCurrentDB() map[string]interface{} {
 
 func InitializeDatabase() error {
 	log.Println("connecting to database")
-	if err := getCurrentDB()[INIT_DB].(func() error)(); err != nil {
+	if err := sqInitDB(); err != nil {
+		//if err := getCurrentDB()[INIT_DB].(func() error)(); err != nil {
 		return err
 	}
 	return createTables()
@@ -43,29 +47,36 @@ func InitializeDatabase() error {
 
 func createTables() error {
 	if err := createTable(USERS_TABLE_NAME); err != nil {
+		//if err := createTable(USERS_TABLE_NAME); err != nil {
 		return err
 	}
 	if err := createTable(PROJECT_TABLE_NAME); err != nil {
+		//if err := createTable(PROJECT_TABLE_NAME); err != nil {
 		return err
 	}
 	if err := createTable(RECORDS_TABLE_NAME); err != nil {
+		//if err := createTable(RECORDS_TABLE_NAME); err != nil {
 		return err
 	}
 	return nil
 }
 
 func createTable(name string) error {
-	return getCurrentDB()[CREATE_TABLE].(func(string) error)(name)
+	return sqCreateTable(name)
+	//return getCurrentDB()[CREATE_TABLE].(func(string) error)(name)
 }
 
 func insert(key, value, table string) error {
-	return getCurrentDB()[INSERT].(func(string, string, string) error)(key, value, table)
+	return sqInsert(key, value, table)
+	//return getCurrentDB()[INSERT].(func(string, string, string) error)(key, value, table)
 }
 
 func fetch(table string) (map[string]string, error) {
-	return getCurrentDB()[FETCH].(func(string) (map[string]string, error))(table)
+	return sqFetchRecords(table)
+	//return getCurrentDB()[FETCH].(func(string) (map[string]string, error))(table)
 }
 
 func delete(key, table string) error {
-	return getCurrentDB()[DELETE].(func(string, string) error)(key, table)
+	//return getCurrentDB()[DELETE].(func(string, string) error)(key, table)
+	return sqDeleteRecord(key, table)
 }

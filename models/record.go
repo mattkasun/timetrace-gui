@@ -8,7 +8,8 @@ import (
 
 type Record struct {
 	ID      uuid.UUID
-	Project uuid.UUID
+	Project string
+	User    uuid.UUID
 	Start   time.Time
 	End     time.Time
 }
