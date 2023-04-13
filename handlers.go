@@ -217,10 +217,11 @@ func GenerateReport(c *gin.Context) {
 	}
 	//get raw report
 	//convert raw report to Indented JSON (some fields of raw not exported
+	reportData := models.ConvertToReport(records)
 	session.Set("message", "")
 	session.Save()
 	pretty.Println(records)
-	c.HTML(http.StatusOK, "ReportData", records)
+	c.HTML(http.StatusOK, "ReportData", reportData)
 }
 
 func EditRecord(c *gin.Context) {

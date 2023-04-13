@@ -45,7 +45,7 @@
 			<form action="/edit" method=post>
 				<input type=hidden name=action value=edit>
 				<input type=hidden name=record value={{ .Start.Format "2006-01-02-15-04" }}>	
-				<button class="w3-button w3-block" type=submit>Start:{{.Start.Format "Jan 02, 2006 15:04:05" }} End:{{ .End.Format "Jan 02, 2006 15:04:05 UTC"}} Billable:{{.IsBillable}}</button>
+				<button class="w3-button w3-block" type=submit>Start:{{.Start.Format "Jan 02, 2006 15:04:05" }} End:{{ .End.Format "Jan 02, 2006 15:04:05 UTC"}} </button>
 			</form>
 		{{end}}
 		<h4> Totals: {{ .Sum }}</h4>
