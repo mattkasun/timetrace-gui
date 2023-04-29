@@ -1,0 +1,16 @@
+[Unit]
+Description=Time Tracker
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=mkasun
+Type=simple
+WorkingDirectory=/home/mkasun/timetrace-gui
+ExecStart=/home/mkasun/timetrace-gui/timetrace-gui
+Restart=on-success
+
+[Install]
+WantedBy=multi-user.target
+
+
