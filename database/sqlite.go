@@ -1,7 +1,6 @@
 package database
 
 import (
-	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
@@ -11,7 +10,6 @@ import (
 	"path/filepath"
 
 	_ "modernc.org/sqlite"
-	//_ "github.com/mattn/go-sqlite3"
 )
 
 // SQLITE_FUNCTIONS - contains a map of the functions for sqlite
@@ -67,15 +65,14 @@ func sqInitDB() error {
 
 func sqCreateTable(table string) error {
 	query := "CREATE TABLE IF NOT EXISTS " + table + " ( key TEXT NOT NULL UNIQUE PRIMARY KEY, value TEXT)"
-	if _, err := db.ExecContext(context.Background(), query); err != nil {
-		//statement, err := db.Prepare(query)
-		//if err != nil {
-		//	log.Println("error preparing query", err)
-		//	return err
-		//}
-		//defer statement.Close()
-		//_, err = statement.Exec()
-		//if err != nil {
+	statement, err := db.Prepare(query)
+	if err != nil {
+		log.Println("error preparing query", err)
+		return err
+	}
+	defer statement.Close()
+	_, err = statement.Exec()
+	if err != nil {
 		log.Println("error executing statement", err)
 		return err
 	}
