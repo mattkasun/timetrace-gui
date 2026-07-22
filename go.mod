@@ -6,7 +6,7 @@ require (
 	github.com/dominikbraun/timetrace v0.14.3
 	github.com/gin-contrib/sessions v0.0.5
 	github.com/gin-gonic/gin v1.9.1
-	golang.org/x/crypto v0.51.0
+	golang.org/x/crypto v0.52.0
 )
 
 require (
